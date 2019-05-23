@@ -1,5 +1,10 @@
 'use strict';
 
+var cytoscape = require('cytoscape');
+var cycola = require('cytoscape-cola');
+
+cytoscape.use(cycola);
+
 var cy = cytoscape({
     container: document.getElementById('cy'),
     style: [
@@ -61,3 +66,5 @@ for (var from in adj) {
         });
     });
 }
+
+cy.layout({ name: 'cola', nodeSpacing: 100 }).run();
