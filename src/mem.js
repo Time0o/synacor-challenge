@@ -24,12 +24,28 @@ function Mem(file) {
 
     this.maxAddr = 2**15 - 1;
 
-    this.read = function(addr) {
+    this.checkAddr = function(addr) {
         if (addr < 0 || addr > this.maxAddr)
             throw new Error('Invalid Address');
-        else if (addr > maxAllocd)
+    }
+
+    this.read = function(addr) {
+        this.checkAddr(addr);
+
+        if (addr > maxAllocd)
             return 0;
         else
-            return buf.readInt16LE(2 * addr);
+            return buf.readUInt16LE(2 * addr);
+    }
+
+    this.write = function(addr, val) {
+        this.checkAddr(addr);
+
+        if (addr > maxAllocd) {
+            buf = Buffer.concat([buf, Buffer.alloc(2 * (addr - maxAllocd))]);
+            maxAllocd = addr;
+        }
+
+        buf.writeUInt16LE(val, 2 * addr);
     }
 }
