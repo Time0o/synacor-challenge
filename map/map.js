@@ -69,6 +69,51 @@ var adj = {
         ['wait', 'you_have_been_eaten_by_a_grue'],
         ['hide', 'you_have_been_eaten_by_a_grue']
     ],
+    twisty_passages1: [
+        ['ladder', 'passage1'],
+        ['north', 'twisty_passages2'],
+        ['south', 'twisty_passages3'],
+        ['east', 'twisty_passages4'],
+        ['west', 'twisty_passages5']
+    ],
+    twisty_passages2: [
+        ['north', 'twisty_passages3'],
+        ['south', 'twisty_passages1'],
+        ['west', 'twisty_passages2']
+    ],
+    twisty_passages3: [
+        ['north', 'twisty_passages1'],
+        ['south', 'twisty_passages2'],
+        ['east', 'twisty_passages3']
+    ],
+    twisty_passages4: [
+        ['north', 'twisty_passages6'],
+        ['south', 'twisty_passages4'],
+        ['east', 'twisty_passages7'],
+        ['west', 'twisty_passages1']
+    ],
+    twisty_passages5: [
+        ['north', 'twisty_passages5'],
+        ['south', 'twisty_passages8'],
+        ['east', 'twisty_passages1']
+    ],
+    twisty_passages6: [
+        ['north', 'twisty_passages3'],
+        ['east', 'twisty_passages2'],
+        ['south', 'twisty_passages6']
+    ],
+    twisty_passages7: [
+        // TODO
+    ],
+    twisty_passages8: [
+        ['north', 'twisty_passages9'],
+        ['south', 'twisty_passages2'],
+        ['east', 'twisty_passages7'],
+        ['west', 'twisty_passages3']
+    ],
+    twisty_passages9: [
+        ['west', 'twisty_passages1']
+    ]
 };
 
 function wrapText(text, maxWidth, delim='\n') {
@@ -125,15 +170,18 @@ for (var from in adj) {
         var dir = edge[0];
         var target = edge[1];
 
-        addNode(target);
+        // don't include self loops
+        if (target != from) {
+            addNode(target);
 
-        cy.add({
-            data: {
-                name: dir + '\n\n\u2060',
-                source: from,
-                target: target
-            }
-        });
+            cy.add({
+                data: {
+                    name: dir + '\n\n\u2060',
+                    source: from,
+                    target: target
+                }
+            });
+        }
     });
 }
 
