@@ -15,7 +15,8 @@ var cy = cytoscape({
                 shape: 'hexagon',
                 'height': 100,
                 'width': 100,
-                'text-valign': 'center'
+                'text-valign': 'center',
+                'text-wrap': 'wrap'
             }
         },
         {
@@ -96,6 +97,22 @@ var adj = {
     ],
 };
 
+function wrapText(text, maxWidth, delim='\n') {
+    if (text.length <= maxWidth)
+        return text;
+
+    var i = maxWidth;
+    while (i > 0 && text[i] != ' ')
+        --i;
+
+    if (i > 0) {
+        var line = text.substring(0, i);
+        var remainder = text.substring(i + 1);
+
+        return line + delim + wrapText(remainder, maxWidth, delim);
+    }
+}
+
 function nodeName(id) {
     // remove numbering
     name = id.replace(/\d*$/, '');
@@ -105,6 +122,9 @@ function nodeName(id) {
 
     // capitalize
     name = name.charAt(0).toUpperCase() + name.slice(1);
+
+    // wrap long names
+    name = wrapText(name, 15);
 
     return name;
 }
