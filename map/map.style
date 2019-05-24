@@ -1,0 +1,21 @@
+node {
+    label: data(name);
+    shape: hexagon;
+    height: 150;
+    width: 150;
+    background-opacity: 0;
+    border-width: 5;
+    border-color: gray;
+    text-valign: center;
+    text-wrap: wrap;
+}
+
+edge {
+    label: data(name);
+    width: 5;
+    curve-style: bezier;
+    control-point-step-size: 100;
+    target-arrow-shape: triangle;
+    text-rotation: autorotate;
+    text-wrap: wrap;
+}

@@ -7,37 +7,6 @@ cytoscape.use(cose);
 
 var cy = cytoscape({
     container: document.getElementById('cy'),
-    style: [
-        {
-            selector: 'node',
-            style: {
-                label: 'data(name)',
-                shape: 'hexagon',
-                'height': 150,
-                'width': 150,
-                'background-opacity': 0,
-                'border-width': 5,
-                'border-color': 'gray',
-                'text-valign': 'center',
-                'text-wrap': 'wrap'
-            }
-        },
-        {
-            selector: 'edge',
-            style: {
-                label: function(label) {
-                    // dirty hack that enables parallel edge labels
-                    return (label.data().name + "\n\n\u2060")
-                },
-                'width': 5,
-                'curve-style': 'bezier',
-                'control-point-step-size': 100,
-                'target-arrow-shape': 'triangle',
-                'text-rotation': 'autorotate',
-                'text-wrap': 'wrap'
-            }
-        }
-    ]
 });
 
 var adj = {
@@ -160,7 +129,7 @@ for (var from in adj) {
 
         cy.add({
             data: {
-                name: dir,
+                name: dir + '\n\n\u2060',
                 source: from,
                 target: target
             }
@@ -168,4 +137,14 @@ for (var from in adj) {
     });
 }
 
-cy.layout({ name: 'cose-bilkent', idealEdgeLength: 100 }).run();
+const layout = {
+    name: 'cose-bilkent',
+    idealEdgeLength: 100
+}
+
+fetch('./map.style')
+    .then(response => response.text())
+    .then(style => {
+        cy.style(style);
+        cy.layout(layout).run();
+    });
