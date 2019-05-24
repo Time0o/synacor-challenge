@@ -11,7 +11,7 @@ var cy = cytoscape({
         {
             selector: 'node',
             style: {
-                label: 'data(id)',
+                label: 'data(name)',
                 shape: 'hexagon',
                 'height': 100,
                 'width': 100,
@@ -23,7 +23,7 @@ var cy = cytoscape({
             style: {
                 label: function(label) {
                     // dirty hack that enables parallel edge labels
-                    return (label.data().dir + "\n\n\u2060")
+                    return (label.data().name + "\n\n\u2060")
                 },
                 'curve-style': 'bezier',
                 'control-point-step-size': 100,
@@ -35,73 +35,91 @@ var cy = cytoscape({
 });
 
 var adj = {
-    'Foothills (1)': [
-        ['doorway', 'Dark cave (1)'],
-        ['south', 'Foothills (2)']
+    foothills1: [
+        ['doorway', 'dark_cave1'],
+        ['south', 'foothills2']
     ],
-    'Foothills (2)': [
-        ['north', 'Foothills (1)']
+    foothills2: [
+        ['north', 'foothills1']
     ],
-    'Dark cave (1)': [
-        ['south', 'Foothills (1)'],
-        ['north', 'Dark cave (2)']
+    dark_cave1: [
+        ['south', 'foothills1'],
+        ['north', 'dark_cave2']
     ],
-    'Dark cave (2)': [
-        ['south', 'Dark cave (1)'],
-        ['north', 'Dark cave (3)']
+    dark_cave2: [
+        ['south', 'dark_cave1'],
+        ['north', 'dark_cave3']
     ],
-    'Dark cave (3)': [
-        ['south', 'Dark cave (2)'],
-        ['bridge', 'Rope bridge (1)']
+    dark_cave3: [
+        ['south', 'dark_cave2'],
+        ['bridge', 'rope_bridge1']
     ],
-    'Rope bridge (1)': [
-        ['back', 'Dark cave (3)'],
-        ['continue', 'Falling through the Air!']
+    rope_bridge1: [
+        ['back', 'dark_cave3'],
+        ['continue', 'falling_through_the_air']
     ],
-    'Falling through the Air!': [
-        ['down', 'Moss cavern (1)']
+    falling_through_the_air: [
+        ['down', 'moss_cavern1']
     ],
-    'Moss cavern (1)': [
-        ['west', 'Moss cavern (2)'],
-        ['east', 'Moss cavern (3)']
+    moss_cavern1: [
+        ['west', 'moss_cavern2'],
+        ['east', 'moss_cavern3']
     ],
-    'Moss cavern (2)': [
-        ['east', 'Moss cavern (1)'],
-        ['passage', 'Passage (1)']
+    moss_cavern2: [
+        ['east', 'moss_cavern1'],
+        ['passage', 'passage1']
     ],
-    'Moss cavern (3)': [
-        ['west', 'Moss cavern (1)']
+    moss_cavern3: [
+        ['west', 'moss_cavern1']
     ],
-    'Passage (1)': [
-        ['cavern', 'Moss cavern (2)'],
-        ['ladder', 'Twisty passages (1)'],
-        ['darkness', 'Passage (2)']
+    passage1: [
+        ['cavern', 'moss_cavern2'],
+        ['ladder', 'twisty_passages1'],
+        ['darkness', 'passage2']
     ],
-    'Passage (2)': [
-        ['back', 'Passage (1)'],
-        ['continue', 'Fumbling around in the darkness (1)']
+    passage2: [
+        ['back', 'passage1'],
+        ['continue', 'fumbling_around_in_the_darkness1']
     ],
-    'Fumbling around in the darkness (1)': [
-        ['forward', 'Fumbling around in the darkness (2)'],
-        ['back', 'Fumbling around in the darkness (2)']
+    fumbling_around_in_the_darkness1: [
+        ['forward', 'fumbling_around_in_the_darkness2'],
+        ['back', 'fumbling_around_in_the_darkness2']
     ],
-    'Fumbling around in the darkness (2)': [
-        ['run', 'Panicked and lost'],
-        ['investigate', 'Panicked and lost']
+    fumbling_around_in_the_darkness2: [
+        ['run', 'panicked_and_lost'],
+        ['investigate', 'panicked_and_lost']
     ],
-    'Panicked and lost': [
-        ['run', 'You have been eaten by a grue'],
-        ['wait', 'You have been eaten by a grue'],
-        ['hide', 'You have been eaten by a grue']
+    panicked_and_lost: [
+        ['run', 'you_have_been_eaten_by_a_grue'],
+        ['wait', 'you_have_been_eaten_by_a_grue'],
+        ['hide', 'you_have_been_eaten_by_a_grue']
     ],
 };
+
+function nodeName(id) {
+    // remove numbering
+    name = id.replace(/\d*$/, '');
+
+    // replace underscores with spaces
+    name = name.replace(/_/g, ' ');
+
+    // capitalize
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+
+    return name;
+}
 
 function addNode(node) {
     if (typeof addNode.existing == 'undefined')
         addNode.existing = new Set();
 
     if (!addNode.existing.has(node)) {
-        cy.add({ data: { id: node } });
+        cy.add({
+            data: {
+                id: node,
+                name: nodeName(node)
+            }
+        });
         addNode.existing.add(node);
     }
 }
@@ -117,7 +135,7 @@ for (var from in adj) {
 
         cy.add({
             data: {
-                dir: dir,
+                name: dir,
                 source: from,
                 target: target
             }
