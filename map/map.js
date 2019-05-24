@@ -13,8 +13,11 @@ var cy = cytoscape({
             style: {
                 label: 'data(name)',
                 shape: 'hexagon',
-                'height': 100,
-                'width': 100,
+                'height': 150,
+                'width': 150,
+                'background-opacity': 0,
+                'border-width': 5,
+                'border-color': 'gray',
                 'text-valign': 'center',
                 'text-wrap': 'wrap'
             }
@@ -26,8 +29,10 @@ var cy = cytoscape({
                     // dirty hack that enables parallel edge labels
                     return (label.data().name + "\n\n\u2060")
                 },
+                'width': 5,
                 'curve-style': 'bezier',
                 'control-point-step-size': 100,
+                'target-arrow-shape': 'triangle',
                 'text-rotation': 'autorotate',
                 'text-wrap': 'wrap'
             }
