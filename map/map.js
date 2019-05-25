@@ -54,7 +54,8 @@ const adjDefault = {
     ],
     passage2: [
         ['back', 'passage1'],
-        ['continue', 'fumbling_around_in_the_darkness1']
+        ['continue', 'fumbling_around_in_the_darkness1'],
+        ['continue (with lamp)', 'dark_passage1']
     ],
     fumbling_around_in_the_darkness1: [
         ['forward', 'fumbling_around_in_the_darkness2'],
@@ -69,6 +70,46 @@ const adjDefault = {
         ['wait', 'you_have_been_eaten_by_a_grue'],
         ['hide', 'you_have_been_eaten_by_a_grue']
     ],
+    dark_passage1: [
+        ['east', 'passage2'],
+        ['west', 'dark_passage2']
+    ],
+    dark_passage2: [
+        ['east', 'dark_passage1'],
+        ['west', 'dark_passage3']
+    ],
+    dark_passage3: [
+        ['east', 'dark_passage2'],
+        ['west', 'ruins1']
+    ],
+    ruins1: [
+        ['east', 'dark_passage3'],
+        ['north', 'ruins2']
+    ],
+    ruins2: [
+        ['north', 'ruins3'],
+        ['south', 'ruins1']
+    ],
+    ruins3: [
+        //['north', ''], // TODO
+        ['south', 'ruins2'],
+        ['east', 'ruins4'],
+        ['west', 'ruins6']
+    ],
+    ruins4: [
+        ['west', 'ruins3'],
+        ['down', 'ruins5']
+    ],
+    ruins5: [
+        ['up', 'ruins4']
+    ],
+    ruins6: [
+        ['up', 'ruins7'],
+        ['east', 'ruins3']
+    ],
+    ruins7: [
+        ['down', 'ruins6']
+    ]
 };
 
 const adjTwisty = {
@@ -174,6 +215,10 @@ function nodeName(id) {
     return name;
 }
 
+function edgeName(dir) {
+    return wrapText(dir, 12);
+}
+
 function addNode(node) {
     if (typeof addNode.existing == 'undefined')
         addNode.existing = new Set();
@@ -211,7 +256,7 @@ function buildGraph(adj, styleFile, layout) {
 
                 cy.add({
                     data: {
-                        name: dir,
+                        name: edgeName(dir),
                         source: from,
                         target: target
                     }
