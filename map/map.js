@@ -5,11 +5,11 @@ var cose = require('cytoscape-cose-bilkent');
 
 cytoscape.use(cose);
 
-var cy = cytoscape({
-    container: document.getElementById('cy'),
-});
+/******************************************************************************
+ * adjacency lists
+ ******************************************************************************/
 
-var adj = {
+const adjDefault = {
     foothills1: [
         ['doorway', 'dark_cave1'],
         ['south', 'foothills2']
@@ -69,6 +69,9 @@ var adj = {
         ['wait', 'you_have_been_eaten_by_a_grue'],
         ['hide', 'you_have_been_eaten_by_a_grue']
     ],
+};
+
+const adjTwisty = {
     twisty_passages1: [
         ['ladder', 'passage1'],
         ['north', 'twisty_passages2'],
@@ -115,6 +118,29 @@ var adj = {
         ['west', 'twisty_passages1']
     ]
 };
+
+/******************************************************************************
+ * styles and layouts
+ ******************************************************************************/
+
+const styleDefault = './map_default.style';
+const styleTwisty = './map_twisty_passages.style';
+
+const layoutDefault = {
+    name: 'cose-bilkent',
+    idealEdgeLength: 100,
+    animate: true
+}
+
+const layoutTwisty = {
+    name: 'circle',
+    spacingFactor: 1.5,
+    animate: true
+}
+
+/******************************************************************************
+ * graph construction helper functions
+ ******************************************************************************/
 
 function wrapText(text, maxWidth, delim='\n') {
     if (text.length <= maxWidth)
@@ -163,36 +189,73 @@ function addNode(node) {
     }
 }
 
-for (var from in adj) {
-    addNode(from);
+function resetGraph() {
+    cy.elements().remove();
 
-    adj[from].forEach(function (edge) {
-        var dir = edge[0];
-        var target = edge[1];
+    addNode.existing = undefined;
+}
 
-        // don't include self loops
-        if (target != from) {
-            addNode(target);
+function buildGraph(adj, styleFile, layout) {
+    resetGraph();
 
-            cy.add({
-                data: {
-                    name: dir + '\n\n\u2060',
-                    source: from,
-                    target: target
-                }
-            });
+    for (var from in adj) {
+        addNode(from);
+
+        adj[from].forEach(function (edge) {
+            var dir = edge[0];
+            var target = edge[1];
+
+            // don't include self loops
+            if (target != from) {
+                addNode(target);
+
+                cy.add({
+                    data: {
+                        name: dir,
+                        source: from,
+                        target: target
+                    }
+                });
+            }
+        });
+    }
+
+    fetch(styleFile)
+        .then(response => response.text())
+        .then(style => {
+            cy.style(style);
+            cy.layout(layout).run();
+        });
+}
+
+/******************************************************************************
+ * create graph
+ ******************************************************************************/
+
+var cy = cytoscape({
+    container: document.getElementById('cy'),
+});
+
+buildGraph(adjDefault, styleDefault, layoutDefault);
+
+/******************************************************************************
+ * expand twisty passages on demand
+ ******************************************************************************/
+
+var twistyExpanded = false;
+
+cy.on('click', 'node', function(evt) {
+    var nodeId = this.id();
+
+    if (!twistyExpanded) {
+        if (nodeId.startsWith('twisty_passages')) {
+            buildGraph(adjTwisty, styleTwisty, layoutTwisty);
+            twistyExpanded = true;
         }
-    });
-}
-
-const layout = {
-    name: 'cose-bilkent',
-    idealEdgeLength: 100
-}
-
-fetch('./map.style')
-    .then(response => response.text())
-    .then(style => {
-        cy.style(style);
-        cy.layout(layout).run();
-    });
+    } else {
+        if (nodeId.startsWith('passage')) {
+            buildGraph(adjDefault, styleDefault, layoutDefault);
+            twistyExpanded = false;
+        }
+    }
+});

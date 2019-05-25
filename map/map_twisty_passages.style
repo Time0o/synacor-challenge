@@ -11,11 +11,14 @@ node {
 }
 
 edge {
-    label: data(name);
     width: 5;
     curve-style: bezier;
     control-point-step-size: 100;
     target-arrow-shape: triangle;
-    text-rotation: autorotate;
+    source-label: data(name);
+    source-text-offset: 50;
+    source-text-rotation: autorotate;
+    text-background-color: white;
+    text-background-opacity: 1;
     text-wrap: wrap;
 }
